@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 // Load routes 
 app.post('/pokemon-informations', getPokemonInformations);
-//app.post('/pokemon-evolutions', getPokemonEvolutions);
+app.post('/pokemon-evolutions', getPokemonEvolutions);
 app.post('/errors', function (req, res) {
     console.error(req.body);
     res.sendStatus(200);
@@ -26,7 +26,7 @@ function findPokemonByName(name) {
 
 
 function getPokemonInformations(req, res) {
-    console.log(req.body.memory.pokemon);
+    console.log(req.body.conversation.memory.pokemon);
     const pokemon = req.body.conversation.memory.pokemon;
     const pokemonInfos = findPokemonByName(pokemon.value);
     if (!pokemonInfos) {
@@ -53,6 +53,52 @@ function getPokemonInformations(req, res) {
                 {
                     type: 'picture',
                     content: pokemonInfos.image
+                },
+            ],
+        });
+    }
+}
+
+function getPokemonEvolutions(req, res) {
+    console.log(req.body.conversation.memory.pokemon);
+    const pokemon = req.body.conversation.memory.pokemon;
+    const pokemonInfos = findPokemonByName(pokemon.value);
+    if (!pokemonInfos) {
+        res.json({
+            replies: [{
+                type: 'text',
+                content: `I don't know a Pokémon called ${pokemon} :(`
+            }, ],
+        });
+    } else if (pokemonInfos.evolutions.length === 1) {
+        res.json({
+            replies: [{
+                type: 'text',
+                content: `${pokemonInfos.name} has no evolutions.`
+            }],
+        });
+    } else {
+        res.json({
+            replies: [{
+                    type: 'text',
+                    content: `${pokemonInfos.name} family`
+                },
+                {
+                    type: 'text',
+                    content: pokemonInfos.evolutions.map(formatEvolutionString).join('\n'),
+                },
+                {
+                    type: 'card',
+                    content: {
+                        title: 'See more about them',
+                        buttons: pokemonInfos.evolutions
+                            .filter(p => p.id !== pokemonInfos.id) // Remove initial pokemon from list               
+                            .map(p => ({
+                                type: 'postback',
+                                title: p.name,
+                                value: `Tell me more about ${p.name}`,
+                            })),
+                    },
                 },
             ],
         });
