@@ -105,6 +105,17 @@ function getPokemonEvolutions(req, res) {
     }
 }
 
+function formatEvolutionString(evolution) {
+    let base = `🔸 ${evolution.name}`;
+    if (evolution.trigger === 'leveling') {
+        base += ` -> lvl ${evolution.trigger_lvl}`;
+    }
+    if (evolution.trigger === 'item') {
+        base += ` -> ${evolution.trigger_item}`;
+    }
+    return base;
+}
+
 // Start server 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`App is listening on port ${PORT}`));
