@@ -3,10 +3,7 @@ const bodyParser = require('body-parser');
 const db = require('./pokedex.json');
 const app = express();
 
-
 app.use(bodyParser.json());
-
-
 // Load routes 
 app.post('/pokemon-informations', getPokemonInformations);
 app.post('/pokemon-evolutions', getPokemonEvolutions);
